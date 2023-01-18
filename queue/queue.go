@@ -65,10 +65,10 @@ func (q *SetQueue) send() error {
 	}
 
 	err = ch.PublishWithContext(q.Ctx,
-		q.Exchange, // Exchange
-		q.Queue,    // queue
-		false,      // mandatory
-		false,      // immediate
+		"discovery", // Exchange
+		q.Queue,     // queue
+		false,       // mandatory
+		false,       // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        q.Message,
