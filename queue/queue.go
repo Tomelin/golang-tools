@@ -38,17 +38,17 @@ func (q *SetQueue) SendMessage(msg []byte) error {
 	return nil
 }
 
-func (q *SetQueue) ReceiveMessage(msg []byte) ([]byte, error) {
-	if err := q.receive(); err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-	}
+// func (q *SetQueue) ReceiveMessage(msg []byte) ([]byte, error) {
+// 	if err := q.receive(); err != nil {
+// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+// 	}
 
-	return q.Message, nil
-}
+// 	return q.Message, nil
+// }
 
 func (q *SetQueue) send() error {
 
-	ch, err := q.connQueue()
+	conn, err := q.connQueue()
 	if err != nil {
 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
 	}
@@ -57,47 +57,52 @@ func (q *SetQueue) send() error {
 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
 	}
 
-	msgs, err := ch.Consume(
-		q.Queue, // queue
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Fatal(err, "Error to connect on channel of Messsage Queue Server")
+	}
+
+	err = ch.PublishWithContext(q.Ctx,
 		"",      // consumer
-		true,    // auto-ack
-		false,   // exclusive
-		false,   // no-local
-		false,   // no-wait
-		nil,     // args
-	)
-
-	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-	}
-	return err
-}
-
-func (q *SetQueue) receive() error {
-
-	x, err := q.connQueue()
-	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-	}
-	err = q.declareQueue()
-	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-	}
-
-	err = x.Publish(
-		"",      // exchange
-		q.Queue, // routing key
+		q.Queue, // queue
 		false,   // mandatory
 		false,   // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        q.Message,
 		})
+
 	if err != nil {
 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
 	}
 	return err
 }
+
+// func (q *SetQueue) receive() error {
+
+// 	x, err := q.connQueue()
+// 	if err != nil {
+// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+// 	}
+// 	err = q.declareQueue()
+// 	if err != nil {
+// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+// 	}
+
+// 	err = x.Publish(
+// 		"",      // exchange
+// 		q.Queue, // routing key
+// 		false,   // mandatory
+// 		false,   // immediate
+// 		amqp.Publishing{
+// 			ContentType: "text/plain",
+// 			Body:        q.Message,
+// 		})
+// 	if err != nil {
+// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+// 	}
+// 	return err
+// }
 
 func (q *SetQueue) declareQueue() error {
 
