@@ -38,14 +38,6 @@ func (q *SetQueue) SendMessage(msg []byte) error {
 	return nil
 }
 
-// func (q *SetQueue) ReceiveMessage(msg []byte) ([]byte, error) {
-// 	if err := q.receive(); err != nil {
-// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-// 	}
-
-// 	return q.Message, nil
-// }
-
 func (q *SetQueue) send() error {
 
 	conn, err := q.connQueue()
@@ -77,32 +69,6 @@ func (q *SetQueue) send() error {
 	}
 	return err
 }
-
-// func (q *SetQueue) receive() error {
-
-// 	x, err := q.connQueue()
-// 	if err != nil {
-// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-// 	}
-// 	err = q.declareQueue()
-// 	if err != nil {
-// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-// 	}
-
-// 	err = x.Publish(
-// 		"",      // exchange
-// 		q.Queue, // routing key
-// 		false,   // mandatory
-// 		false,   // immediate
-// 		amqp.Publishing{
-// 			ContentType: "text/plain",
-// 			Body:        q.Message,
-// 		})
-// 	if err != nil {
-// 		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
-// 	}
-// 	return err
-// }
 
 func (q *SetQueue) declareQueue() error {
 
@@ -141,7 +107,6 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 	})
 
 	if err != nil {
-		fmt.Printf("\nError to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword)
 		slog.Info("\nError to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword, slog.Duration("duration", time.Since(time.Now())))
 		defer conn.Close()
 		fmt.Println(err, fmt.Sprintf("Error to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword))
