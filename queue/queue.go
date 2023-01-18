@@ -22,11 +22,11 @@ type ConfigMQ struct {
 }
 
 type SetQueue struct {
-	Ctx        context.Context `json:"ctx" binding:"required"`
-	Queue      string          `json:"queue" binding:"required"`
-	Connection ConfigMQ        `json:"connection" binding:"required"`
-	Type       string          `json:"type" binding:"required,enum" enum:"send,receive"`
-	Message    []byte          `json:"message" binding:"required"`
+	Ctx         context.Context `json:"ctx" binding:"required"`
+	Queue       string          `json:"queue" binding:"required"`
+	Connection  ConfigMQ        `json:"connection" binding:"required"`
+	MessageType string          `json:"messageType" binding:"required,enum" enum:"send,receive"`
+	Message     []byte          `json:"message" binding:"required"`
 }
 
 func (q *SetQueue) SendMessage(msg []byte) error {
