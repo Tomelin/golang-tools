@@ -33,7 +33,7 @@ type SetQueue struct {
 }
 
 var (
-	textHandler = slog.NewTextHandler(os.Stdout)
+	textHandler = slog.NewJSONHandler(os.Stdout)
 	logger      = slog.New(textHandler)
 )
 
@@ -109,7 +109,7 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
 	connString := fmt.Sprintf("%s://%s:%s@%s:%s/%s", q.Connection.MQProtocol, q.Connection.MQUser, q.Connection.MQPassword, q.Connection.MQServer, q.Connection.MQPort, q.Connection.MQVhost)
 	if q.Debug {
-		logger.Debug("ConnectionSring", connString, slog.Duration("duration", time.Since(time.Now())))
+		logger.Debug("Error to connect in Message Queue Server", slog.String("ConnectionSring", connString), slog.Duration("duration", time.Since(time.Now())))
 	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
