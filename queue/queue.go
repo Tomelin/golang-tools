@@ -115,7 +115,7 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
-			return net.DialTimeout(network, addr, 1*time.Second)
+			return net.DialTimeout(network, addr, 15*time.Second)
 		},
 	})
 
