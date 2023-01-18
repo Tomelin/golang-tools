@@ -31,6 +31,7 @@ type SetQueue struct {
 	Message     []byte          `json:"message" binding:"required"`
 	Debug       bool            `json:"debug"`
 	Exchange    string          `json:"exchange"`
+	Timeout     time.Duration   `json:"timeout"`
 }
 
 var (
@@ -109,13 +110,17 @@ func (q *SetQueue) declareQueue() error {
 
 func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
+	if q.Timeout == 0 {
+		q.Timeout = time.Duration(15)
+	}
+
 	connString := fmt.Sprintf("%s://%s:%s@%s:%s/%s", q.Connection.MQProtocol, q.Connection.MQUser, q.Connection.MQPassword, q.Connection.MQServer, q.Connection.MQPort, q.Connection.MQVhost)
 	if q.Debug {
 		logger.Debug("Error to connect in Message Queue Server", slog.String("ConnectionSring", connString), slog.Duration("duration", time.Since(time.Now())))
 	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
-			return net.DialTimeout(network, addr, 15*time.Second)
+			return net.DialTimeout(network, addr, time.Duration(q.Timeout))
 		},
 	})
 
