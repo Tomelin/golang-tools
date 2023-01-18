@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"strconv"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -27,7 +29,13 @@ type SetQueue struct {
 	Connection  ConfigMQ        `json:"connection" binding:"required"`
 	MessageType string          `json:"messageType" binding:"required,enum" enum:"send,receive"`
 	Message     []byte          `json:"message" binding:"required"`
+	Debug       bool            `json:"debug"`
 }
+
+var (
+	textHandler = slog.NewTextHandler(os.Stdout)
+	logger      = slog.New(textHandler)
+)
 
 func (q *SetQueue) SendMessage(msg []byte) error {
 
@@ -100,6 +108,9 @@ func (q *SetQueue) declareQueue() error {
 func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
 	connString := fmt.Sprintf("%s://%s:%s@%s:%s/%s", q.Connection.MQProtocol, q.Connection.MQUser, q.Connection.MQPassword, q.Connection.MQServer, q.Connection.MQPort, q.Connection.MQVhost)
+	if q.Debug {
+		logger.Debug("ConnectionSring", connString, slog.Duration("duration", time.Since(time.Now())))
+	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
 			return net.DialTimeout(network, addr, 1*time.Second)
@@ -107,7 +118,22 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 	})
 
 	if err != nil {
-		slog.Info("\nError to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword, slog.Duration("duration", time.Since(time.Now())))
+		if q.Debug {
+			logger.Debug("Error to connect on Message Queue Server",
+				slog.String("error", err.Error()),
+				slog.String("server", q.Connection.MQServer),
+				slog.String("port", q.Connection.MQPort),
+				slog.String("protocol", q.Connection.MQProtocol),
+				slog.String("sslEnabled", strconv.FormatBool(q.Connection.MQSsl)),
+				slog.String("vhost", q.Connection.MQVhost),
+				slog.String("user", q.Connection.MQUser),
+				slog.String("password", q.Connection.MQPassword),
+				slog.String("ConnectionSring", connString),
+				slog.Duration("duration", time.Since(time.Now())),
+			)
+		} else {
+			slog.Info("\nError to connect on Message Queue Server (%v) with username (%v)", q.Connection.MQServer, q.Connection.MQUser, slog.Duration("duration", time.Since(time.Now())))
+		}
 		defer conn.Close()
 		fmt.Println(err, fmt.Sprintf("Error to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword))
 	}
