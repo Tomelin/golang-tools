@@ -40,27 +40,28 @@ var (
 
 func (q *SetQueue) SendMessage(msg []byte) error {
 
-	if err := q.send(); err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+	err := q.send()
+	if err != nil {
+		log.Print("Error to publish the message on Message Queue Server at queue (%v) and error is (%v) ", q.Queue, err.Error())
 	}
 
-	return nil
+	return err
 }
 
 func (q *SetQueue) send() error {
 
 	conn, err := q.connQueue()
 	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 	err = q.declareQueue()
 	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatal(err, "Error to connect on channel of Messsage Queue Server")
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 
 	err = ch.PublishWithContext(q.Ctx,
@@ -74,7 +75,7 @@ func (q *SetQueue) send() error {
 		})
 
 	if err != nil {
-		log.Fatal(err, fmt.Sprintf("Error to publish the message on Message Queue Server ate channel (%v) ", q.Queue))
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 	return err
 }
@@ -83,13 +84,13 @@ func (q *SetQueue) declareQueue() error {
 
 	conn, err := q.connQueue()
 	if err != nil {
-		log.Fatal(err, "Error to connect in Message Queue Server")
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatal(err, "Error to connect on channel of Messsage Queue Server")
+		log.Print("Error to publish the message on Message Queue Server at queue (%v)and error is (%v) ", q.Queue, err.Error())
 	}
 	defer ch.Close()
 
@@ -145,5 +146,5 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 		defer ch.Close()
 	}
 
-	return conn, nil
+	return conn, err
 }
