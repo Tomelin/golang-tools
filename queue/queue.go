@@ -113,7 +113,7 @@ func (q *SetQueue) declareQueue() error {
 	}
 	defer ch.Close()
 
-	d, err := ch.QueueDeclare(
+	_, err = ch.QueueDeclare(
 		q.Queue, // name
 		false,   // durable
 		false,   // delete when unused
