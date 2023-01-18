@@ -30,6 +30,7 @@ type SetQueue struct {
 	MessageType string          `json:"messageType" binding:"required,enum" enum:"send,receive"`
 	Message     []byte          `json:"message" binding:"required"`
 	Debug       bool            `json:"debug"`
+	Exchange    string          `json:"exchange"`
 }
 
 var (
@@ -63,10 +64,10 @@ func (q *SetQueue) send() error {
 	}
 
 	err = ch.PublishWithContext(q.Ctx,
-		"",      // consumer
-		q.Queue, // queue
-		false,   // mandatory
-		false,   // immediate
+		q.Exchange, // Exchange
+		q.Queue,    // queue
+		false,      // mandatory
+		false,      // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        q.Message,
