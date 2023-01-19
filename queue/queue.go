@@ -109,7 +109,7 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
 	connString := fmt.Sprintf("%s://%s:%s@%s:%s/%s", q.Connection.MQProtocol, q.Connection.MQUser, q.Connection.MQPassword, q.Connection.MQServer, q.Connection.MQPort, q.Connection.MQVhost)
 	if q.Debug {
-		logger.Debug("Error to connect in Message Queue Server", fmt.Sprintf("ConnectionSring", connString), fmt.Sprintf("duration %v", time.Since(time.Now())))
+		fmt.Printf("Error to connect in Message Queue Server", fmt.Sprintf("ConnectionSring", connString), fmt.Sprintf("duration %v", time.Since(time.Now())))
 	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
