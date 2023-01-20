@@ -109,7 +109,7 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
 	connString := fmt.Sprintf("%s://%s:%s@%s:%s/%s", q.Connection.MQProtocol, q.Connection.MQUser, q.Connection.MQPassword, q.Connection.MQServer, q.Connection.MQPort, q.Connection.MQVhost)
 	if q.Debug {
-		fmt.Printf("Error to connect in Message Queue Server", fmt.Sprintf("ConnectionSring", connString), fmt.Sprintf("duration %v", time.Since(time.Now())))
+		fmt.Printf("\nError to connect in Message Queue Server", fmt.Sprintf("ConnectionSring=", connString), fmt.Sprintf("duration= %v", time.Since(time.Now())))
 	}
 	conn, err := amqp.DialConfig(connString, amqp.Config{
 		Dial: func(network, addr string) (net.Conn, error) {
@@ -119,23 +119,23 @@ func (q *SetQueue) connQueue() (*amqp.Connection, error) {
 
 	if err != nil {
 		if q.Debug {
-			fmt.Printf("Error to connect on Message Queue Server",
-				fmt.Sprintf("error", err.Error()),
-				fmt.Sprintf("server", q.Connection.MQServer),
-				fmt.Sprintf("port", q.Connection.MQPort),
-				fmt.Sprintf("protocol", q.Connection.MQProtocol),
-				fmt.Sprintf("sslEnabled", strconv.FormatBool(q.Connection.MQSsl)),
-				fmt.Sprintf("vhost", q.Connection.MQVhost),
-				fmt.Sprintf("user", q.Connection.MQUser),
-				fmt.Sprintf("password", q.Connection.MQPassword),
-				fmt.Sprintf("ConnectionSring", connString),
-				fmt.Sprintf("duration %v", time.Since(time.Now())),
+			fmt.Printf("\nError to connect on Message Queue Server",
+				fmt.Sprintf("error=", err.Error()),
+				fmt.Sprintf("server=", q.Connection.MQServer),
+				fmt.Sprintf("port=", q.Connection.MQPort),
+				fmt.Sprintf("protocol=", q.Connection.MQProtocol),
+				fmt.Sprintf("sslEnabled=", strconv.FormatBool(q.Connection.MQSsl)),
+				fmt.Sprintf("vhost=", q.Connection.MQVhost),
+				fmt.Sprintf("user=", q.Connection.MQUser),
+				fmt.Sprintf("password=", q.Connection.MQPassword),
+				fmt.Sprintf("ConnectionSring=", connString),
+				fmt.Sprintf("duration= %v", time.Since(time.Now())),
 			)
 		} else {
 			fmt.Printf("\nError to connect on Message Queue Server (%v) with username (%v)", q.Connection.MQServer, q.Connection.MQUser, fmt.Sprintf("duration %v", time.Since(time.Now())))
 		}
 		defer conn.Close()
-		fmt.Println(err, fmt.Sprintf("Error to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword))
+		fmt.Println(err, fmt.Sprintf("\nError to connect on Message Queue Server (%v) with username (%v) and password (%v)", q.Connection.MQServer, q.Connection.MQUser, q.Connection.MQPassword))
 	}
 
 	ch, err := conn.Channel()
